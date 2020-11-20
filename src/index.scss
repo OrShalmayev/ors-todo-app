@@ -1,3 +1,13 @@
+// Override default variables before the import
+$body-bg: #000;
+
+// Import Bootstrap and its default variables
+@import '~bootstrap/scss/bootstrap.scss';
+
+// Notifications:
+@import 'react-notifications/lib/notifications.css';
+
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
