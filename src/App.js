@@ -2,7 +2,7 @@
 import React from 'react';
 // External Packages
 import _ from 'underscore';
-import {NotificationContainer, NotificationManager} from 'react-notifications';
+import {NotificationContainer} from 'react-notifications';
 
 // CSS
 import './App.scss';
@@ -10,10 +10,13 @@ import './App.scss';
 import {connect} from 'react-redux';
 // STORE
 import {
+  // global variables
+  dynamic_actions,
   addTodo, 
   completeTodo, 
   trashTodo, 
-  deleteTodo
+  deleteTodo,
+  createNotification
 } from './store';
 
 // EXTERNAL COMPONENTS
@@ -35,8 +38,6 @@ function App(props) {
     // store the value in the store
     // add a todo ony if the value is greater than 1
     if (inputValue.length >= 1) {
-      // show success notification
-      createNotification('success')();
       // reset the add task text
       task.current.value = '';
       // add to store the task
@@ -55,32 +56,6 @@ function App(props) {
     return string.trim();
   }
 
-  // Reference: https://www.npmjs.com/package/react-notifications
-  const createNotification = (type) => {
-    return () => {
-      switch (type) {
-        case 'info':
-          NotificationManager.info('Info message');
-          break;
-        case 'success':
-          NotificationManager.success('Success', 'Task Added');
-          break;
-        case 'warning':
-          NotificationManager.warning('At least 1 letter is required', 'Warning', 1500);
-          break;
-        case 'error':
-          NotificationManager.error('Error message', 'Click me!', 5000, () => {
-            alert('callback');
-          });
-          break;
-        default:
-            NotificationManager.error('Error message', 'Click me!', 5000, () => {
-              alert('callback');
-            });
-          break;
-      }//END switch
-    };//returned annonymos function
-  };//END createNotification
 
 
   /**
@@ -126,19 +101,19 @@ function App(props) {
               <Todos drilled={({
                 title: 'Your Todos',
                 props_to_map: 'todos',
-                actions: ['complete', 'edit', 'trash']
+                actions: [...dynamic_actions.actions_1]
               })} />
               {/* COMPLETED TODOS */}
               <Todos drilled={({
                 title: 'Completed Todos',
                 props_to_map: 'completed_todos',
-                actions: ['uncomplete', 'edit', 'trash']
+                actions: [...dynamic_actions.actions_2]
               })} />
               {/* TRASHED TODOS */}
               <Todos drilled={({
                 title: 'Trashed Todos',
                 props_to_map: 'trash',
-                actions: ['uncomplete', 'edit', 'delete']
+                actions: [...dynamic_actions.actions_3]
               })} />
             </React.Fragment>
         }{/* END Looping through ttodos */}

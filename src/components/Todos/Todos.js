@@ -6,11 +6,15 @@ import _ from 'underscore';
 import {connect} from 'react-redux';
 // STORE
 import {
+  // Global variables
   addTodo, 
   completeTodo, 
+  editTodo,
+  unEditTodo,
   trashTodo, 
   deleteTodo,
-  uncompleteTodo
+  uncompleteTodo,
+  updateTodoOnChange,
 } from '../../store';
 
 const Todos = (props) => {
@@ -18,10 +22,24 @@ const Todos = (props) => {
   /**
   * Handlers
   */
+
+  React.useEffect(()=>{
+    // Component did mount
+  }, []);
+
+  const editInput = React.useRef('');
+
   const handleCompleteTodo = (id, state_key_where_todo_is) => {
     props.completeTodo(id, state_key_where_todo_is);
   }//END handleCompleteTodo
 
+  const handleEditTodo = (id, state_key_where_todo_is) => {
+    props.editTodo(id, state_key_where_todo_is);
+  }//END handleCompleteTodo
+
+  const handleUnEditTodo = (id, state_key_where_todo_is) => {
+    props.unEditTodo(id, state_key_where_todo_is);
+  }//END handleCompleteTodo
   
   const handleTrashTodo = (id, state_key_where_todo_is) => {
     props.trashTodo(id, state_key_where_todo_is);
@@ -35,6 +53,7 @@ const Todos = (props) => {
     props.uncompleteTodo(id, state_key_where_todo_is);
   }
 
+
   const handleDynamicProps = () => {
     return eval(`props.${props.drilled.props_to_map}`); 
   }
@@ -43,6 +62,21 @@ const Todos = (props) => {
     return eval(`handle${upperFirstLetter(action)}Todo`); 
   }
 
+  const handleOnBlurInput = (evnt, todo_id, state_key_where_todo_is) => {
+    // if the value is less then the required then stay focus on this input 
+    let editedInputVal = editInput.current.value;
+    if(editInput.current.value.length < 1){
+      // show error notification
+      // stay focus on this input / maybe put the value to the revious value
+    } else {
+    // if the value is passing the required validations then save the edited todo in the store
+      props.unEditTodo(todo_id, state_key_where_todo_is);
+    }
+  }
+
+  const handleOnTodoChange = (val, todo_id, state_key_where_todo_is) => {
+    props.updateTodoOnChange(todo_id, state_key_where_todo_is, val);
+  }
   /**
    * Helpers
    */
@@ -63,8 +97,19 @@ const Todos = (props) => {
           <h6>{props.drilled.title}</h6>
           {handleDynamicProps().map((item)=>(
             <div className="input-group mb-3" key={item.id}>
-              {/* <input type="text" className="form-control" value="todo 1s" placeholder="" /> */}
-              <div className="form-control text-left">{item.description}</div>
+              { item.isEditing ? 
+                <input 
+                  autoFocus 
+                  onBlur={(evnt)=>handleOnBlurInput(evnt, item.id, props.drilled.props_to_map)}
+                  onChange={e => handleOnTodoChange(e.target.value, item.id, props.drilled.props_to_map)}
+                  ref={editInput} 
+                  type="text" 
+                  className="form-control" 
+                  value={item.description} 
+                  placeholder={item.description} />
+              :
+                <div className="form-control text-left">{item.description}</div>
+              }
               <div className="input-group-append">
                 {props.drilled.actions.map(action=>(
                   <button 
@@ -84,10 +129,14 @@ const Todos = (props) => {
   );
 }
 
-const mapStateToProps = (state) => (state)
+const mapStateToProps = (state) => (state);
+
 const mapDispatchToProps = {
   addTodo,
   completeTodo,
+  editTodo,
+  unEditTodo,
+  updateTodoOnChange,
   trashTodo,
   deleteTodo,
   uncompleteTodo
